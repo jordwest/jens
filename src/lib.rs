@@ -73,7 +73,7 @@ impl Template {
         lines.join("\n")
     }
 
-    pub fn parse_lines(template_str: &Vec<&str>) -> Template {
+    fn parse_lines(template_str: &Vec<&str>) -> Template {
         let opening_tag = Regex::new(r"<([A-z]+)>").unwrap();
         let closing_tag = Regex::new(r"</([A-z]+)>").unwrap();
         let single_tag = Regex::new(r"\^\^ ([A-z]+)").unwrap();
@@ -125,13 +125,5 @@ impl Template {
 
     pub fn parse(template_str: &str) -> Template {
         Template::parse_lines(&template_str.split('\n').into_iter().collect())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
     }
 }
