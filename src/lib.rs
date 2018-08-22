@@ -5,7 +5,7 @@ use regex::Regex;
 #[derive(Debug, Clone)]
 pub enum TemplatePart {
     Text(String),
-    Section(String, Box<Template>),
+    Section(String, Template),
 }
 
 #[derive(Debug, Clone)]
@@ -48,9 +48,9 @@ impl Template {
             match part {
                 TemplatePart::Section(ref k, ref t) if k == section_name => {
                     for val in values {
-                        let mut template: Template = *t.clone();
+                        let mut template: Template = t.clone();
                         map(val, &mut template);
-                        new_parts.push(TemplatePart::Section(k.clone(), Box::from(template)));
+                        new_parts.push(TemplatePart::Section(k.clone(), template));
                     }
                 }
                 part => new_parts.push(part.clone()),
@@ -90,7 +90,7 @@ impl Template {
                         current_section = None;
                         template.parts.push(TemplatePart::Section(
                             String::from(section_name),
-                            Box::from(Template::parse_lines(&section_lines)),
+                            Template::parse_lines(&section_lines),
                         ));
                     } else {
                         section_lines.push(line);
@@ -109,9 +109,9 @@ impl Template {
                 let last_line = template.parts.pop().unwrap();
                 template.parts.push(TemplatePart::Section(
                     String::from(section_name),
-                    Box::from(Template {
+                    Template {
                         parts: vec![last_line],
-                    }),
+                    },
                 ))
             } else {
                 template.parts.push(TemplatePart::Text(String::from(*line)));
