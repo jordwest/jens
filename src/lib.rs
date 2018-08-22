@@ -1,3 +1,5 @@
+extern crate regex;
+
 use regex::Regex;
 
 #[derive(Debug, Clone)]
@@ -88,7 +90,7 @@ impl Template {
                         current_section = None;
                         template.parts.push(TemplatePart::Section(
                             String::from(section_name),
-                            Box::from(parse_lines(&section_lines)),
+                            Box::from(Template::parse_lines(&section_lines)),
                         ));
                     } else {
                         section_lines.push(line);
@@ -122,7 +124,7 @@ impl Template {
     }
 
     pub fn parse(template_str: &str) -> Template {
-        parse_lines(&template_str.split('\n').into_iter().collect())
+        Template::parse_lines(&template_str.split('\n').into_iter().collect())
     }
 }
 
