@@ -16,6 +16,6 @@ fn main() {
     ];
 
     let mut template = Template::parse(include_str!("./emoji.js"));
-    template.repeat_section("Entry", &emoji, &emoji_entry);
+    template.repeat_template("Entry", &emoji, &emoji_entry);
     println!("{}", template.output());
 }

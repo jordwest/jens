@@ -5,12 +5,17 @@ use regex::Regex;
 #[derive(Debug, Clone)]
 pub enum TemplatePart {
     Text(String),
-    Section(String, Template),
+    Subtemplate(String, Template),
 }
 
 #[derive(Debug, Clone)]
 pub struct Template {
     parts: Vec<TemplatePart>,
+}
+
+#[derive(Clone)]
+struct ParseState {
+    directive: String,
 }
 
 impl Template {
@@ -19,16 +24,16 @@ impl Template {
         for mut part in &mut self.parts {
             match part {
                 TemplatePart::Text(s) => *s = s.replace(find, replace),
-                TemplatePart::Section(_, t) => t.replace(find, replace),
+                TemplatePart::Subtemplate(_, t) => t.replace(find, replace),
             }
         }
     }
 
     /// Process a specific template section
-    pub fn with_section(&mut self, section_name: &str, map: &Fn(&mut Template)) {
+    pub fn with_template(&mut self, section_name: &str, map: &Fn(&mut Template)) {
         for part in &mut self.parts {
             match part {
-                TemplatePart::Section(ref k, t) if k == section_name => {
+                TemplatePart::Subtemplate(ref k, t) if k == section_name => {
                     map(t);
                 }
                 _ => (),
@@ -37,7 +42,7 @@ impl Template {
     }
 
     /// Repeats a template section for each of `values`, running `map` over each instance
-    pub fn repeat_section<T>(
+    pub fn repeat_template<T>(
         &mut self,
         section_name: &str,
         values: &Vec<T>,
@@ -46,11 +51,11 @@ impl Template {
         let mut new_parts = vec![];
         for part in &mut self.parts {
             match part {
-                TemplatePart::Section(ref k, ref t) if k == section_name => {
+                TemplatePart::Subtemplate(ref k, ref t) if k == section_name => {
                     for val in values {
                         let mut template: Template = t.clone();
                         map(val, &mut template);
-                        new_parts.push(TemplatePart::Section(k.clone(), template));
+                        new_parts.push(TemplatePart::Subtemplate(k.clone(), template));
                     }
                 }
                 part => new_parts.push(part.clone()),
@@ -67,13 +72,13 @@ impl Template {
         for part in &self.parts {
             match part {
                 TemplatePart::Text(ref s) => lines.push(s.clone()),
-                TemplatePart::Section(_, t) => lines.push(t.output()),
+                TemplatePart::Subtemplate(_, t) => lines.push(t.output()),
             }
         }
         lines.join("\n")
     }
 
-    fn parse_lines(template_str: &Vec<&str>) -> Template {
+    fn parse_lines(template_str: &Vec<&str>, parse_state: ParseState) -> Template {
         let opening_tag = Regex::new(r"<([A-z]+)>").unwrap();
         let closing_tag = Regex::new(r"</([A-z]+)>").unwrap();
         let single_tag = Regex::new(r"\^\^ ([A-z]+)").unwrap();
@@ -88,9 +93,9 @@ impl Template {
                     let section_name = captures.get(1).unwrap().as_str();
                     if section_name == v {
                         current_section = None;
-                        template.parts.push(TemplatePart::Section(
+                        template.parts.push(TemplatePart::Subtemplate(
                             String::from(section_name),
-                            Template::parse_lines(&section_lines),
+                            Template::parse_lines(&section_lines, parse_state.clone()),
                         ));
                     } else {
                         section_lines.push(line);
@@ -107,7 +112,7 @@ impl Template {
                 let captures = single_tag.captures(line).unwrap();
                 let section_name = captures.get(1).unwrap().as_str();
                 let last_line = template.parts.pop().unwrap();
-                template.parts.push(TemplatePart::Section(
+                template.parts.push(TemplatePart::Subtemplate(
                     String::from(section_name),
                     Template {
                         parts: vec![last_line],
@@ -124,6 +129,9 @@ impl Template {
     }
 
     pub fn parse(template_str: &str) -> Template {
-        Template::parse_lines(&template_str.split('\n').into_iter().collect())
+        let parse_state = ParseState {
+            directive: String::from("#"),
+        };
+        Template::parse_lines(&template_str.split('\n').into_iter().collect(), parse_state)
     }
 }
