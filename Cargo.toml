@@ -7,3 +7,5 @@ authors = ["Jordan West <jordwest@gmail.com>"]
 repository = "https://github.com/jordwest/jens"
 
 [dependencies]
+pest = "1.0.6"
+pest_derive = "1.0.8"
