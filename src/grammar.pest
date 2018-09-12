@@ -1,0 +1,18 @@
+wsp = _{ ( " " | "\t" )* }
+significant_whitespace = { ( " " | "\t" )+ }
+newline = _{ "\n" }
+
+identifier = { ('A'..'z' | '0'..'9' | "_" )+ }
+
+template_empty_line = { "\n" }
+template_content = { (!newline ~ any)* }
+template_line = { significant_whitespace ~ template_content ~ newline }
+template_decl = { identifier ~ wsp ~ "=" ~ wsp }
+template_terminator = { "-"+ ~ newline }
+template = { template_decl ~ newline ~ (template_line | template_empty_line)* ~ template_terminator }
+
+file = { soi ~ (template | newline)* ~ eoi }
+
+placeholder = { "${" ~ identifier ~ "}" }
+not_placeholder = { (!("${") ~ any)+ }
+template_phase2 = { soi ~ (not_placeholder | placeholder)* ~ eoi }

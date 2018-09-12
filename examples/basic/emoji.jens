@@ -1,0 +1,27 @@
+outline =
+    ${map}
+
+    ${logger}
+----
+
+map =
+    var ${name} = {
+        ${entries}
+    }
+----
+
+key_value =
+    "${key}": "${value}",
+----
+
+logger =
+    var Logger = {
+        ${functions}
+    };
+----
+
+log_function =
+    log_${key}: function() {
+        console.log(${map}.${key})
+    },
+----
