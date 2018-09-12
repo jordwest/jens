@@ -16,6 +16,7 @@ fn replace_chars_with_whitespace(line: &str) -> String {
 #[derive(Clone)]
 enum LineSegment {
     Content(String),
+    Placeholder(String),
     Block(Block),
 }
 
@@ -23,6 +24,7 @@ impl LineSegment {
     fn write_to(&self, f: &mut fmt::Formatter, prefix: &str) -> fmt::Result {
         match self {
             LineSegment::Content(s) => write!(f, "{}", s),
+            LineSegment::Placeholder(s) => write!(f, "${{{}}}", s),
             LineSegment::Block(b) => {
                 let prefix = replace_chars_with_whitespace(prefix);
                 b.write_to(f, &prefix)
@@ -126,7 +128,7 @@ mod tests {
         write!(&mut s, "{}", function);
         assert_eq!(
             s,
-            include_str!("./test_output/block.outputs_a_block_with_correct_indentation.txt")
+            include_str!("./snapshots/block.outputs_a_block_with_correct_indentation.txt")
         );
     }
 }
