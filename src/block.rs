@@ -1,5 +1,17 @@
 use std::fmt;
 
+/// Replace every character in a string with a space, but preserve tabs
+fn replace_chars_with_whitespace(line: &str) -> String {
+    let mut out = String::with_capacity(line.len());
+    for c in line.chars() {
+        match c {
+            '\t' => out.push('\t'),
+            _ => out.push(' '),
+        }
+    }
+    out
+}
+
 /// Represents a segment of a line, potentially containing another block
 #[derive(Clone)]
 enum LineSegment {
@@ -11,7 +23,10 @@ impl LineSegment {
     fn write_to(&self, f: &mut fmt::Formatter, prefix: &str) -> fmt::Result {
         match self {
             LineSegment::Content(s) => write!(f, "{}", s),
-            LineSegment::Block(b) => b.write_to(f, prefix),
+            LineSegment::Block(b) => {
+                let prefix = replace_chars_with_whitespace(prefix);
+                b.write_to(f, &prefix)
+            }
         }
     }
 }
@@ -80,33 +95,38 @@ mod tests {
     use super::*;
 
     #[test]
-    fn outputs_a_block() {
+    fn outputs_a_block_with_correct_indentation() {
         use std::fmt::Write;
-        let one_line_block = Block(vec![Line(vec![LineSegment::from("body();")])]);
-        let multi_line_block = Block(vec![
+
+        let arg_list = Block(vec![
+            Line(vec![LineSegment::from("arg1: string,")]),
+            Line(vec![LineSegment::from("arg2: number,")]),
+            Line(vec![LineSegment::from("arg3: Object")]),
+        ]);
+
+        let function_body = Block(vec![
             Line(vec![LineSegment::from("body();")]),
             Line(vec![LineSegment::from("body2();")]),
         ]);
 
-        let make_function_block = |function_body: &Block| {
-            Block(vec![
-                Line(vec![LineSegment::from("function test() {")]),
-                Line(vec![
-                    LineSegment::from("  "),
-                    LineSegment::Block(function_body.clone()),
-                ]),
-                Line(vec![LineSegment::from("}")]),
-            ])
-        };
+        let function = Block(vec![
+            Line(vec![
+                LineSegment::from("function test("),
+                LineSegment::Block(arg_list),
+                LineSegment::from(") {"),
+            ]),
+            Line(vec![
+                LineSegment::from("  "),
+                LineSegment::Block(function_body.clone()),
+            ]),
+            Line(vec![LineSegment::from("}")]),
+        ]);
 
-        let one_func = make_function_block(&one_line_block);
-        let mut s1 = String::new();
-        write!(&mut s1, "{}", one_func);
-        assert_eq!(s1, "function test() {\n  body();\n}");
-
-        let two_funcs = make_function_block(&multi_line_block);
-        let mut s2 = String::new();
-        write!(&mut s2, "{}", two_funcs);
-        assert_eq!(s2, "function test() {\n  body();\n  body2();\n}");
+        let mut s = String::new();
+        write!(&mut s, "{}", function);
+        assert_eq!(
+            s,
+            include_str!("./test_output/block.outputs_a_block_with_correct_indentation.txt")
+        );
     }
 }
