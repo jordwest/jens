@@ -13,8 +13,8 @@ fn replace_chars_with_whitespace(line: &str) -> String {
 }
 
 /// Represents a segment of a line, potentially containing another block
-#[derive(Clone)]
-enum LineSegment {
+#[derive(Clone, PartialEq, Debug)]
+pub enum LineSegment {
     Content(String),
     Placeholder(String),
     Block(Block),
@@ -31,6 +31,15 @@ impl LineSegment {
             }
         }
     }
+
+    fn replace(&mut self, new_segment: LineSegment) {
+        match self.clone() {
+            LineSegment::Placeholder(_) => {
+                *self = new_segment;
+            }
+            _ => (),
+        }
+    }
 }
 
 impl<T: Into<String>> From<T> for LineSegment {
@@ -40,8 +49,8 @@ impl<T: Into<String>> From<T> for LineSegment {
 }
 
 /// Represents a single line inside a block of text
-#[derive(Clone)]
-struct Line(Vec<LineSegment>);
+#[derive(Clone, PartialEq, Debug)]
+pub struct Line(pub Vec<LineSegment>);
 
 impl<T: Into<String>> From<T> for Line {
     fn from(v: T) -> Self {
@@ -61,10 +70,31 @@ impl Line {
         }
         Ok(())
     }
+
+    pub fn set_placeholder(&mut self, placeholder_name: &str, content: &Block) {
+        for segment in &mut self.0 {
+            match segment.clone() {
+                LineSegment::Placeholder(ref name) if name == placeholder_name => {
+                    segment.replace(LineSegment::Block(content.clone()));
+                }
+                _ => (),
+            }
+        }
+        // let segments: Vec<LineSegment> = self
+        //     .0
+        //     .into_iter()
+        //     .map(|ref mut s| match s {
+        //     }).collect();
+
+        // self.0 = segments;
+    }
 }
 
-#[derive(Clone)]
-struct Block(Vec<Line>);
+/// A `Block` is one or many lines of text. More blocks can be embedded within a
+/// line, in which case the indentation of the previous line will be preserved when
+/// outputting new lines.
+#[derive(Clone, PartialEq, Debug)]
+pub struct Block(pub Vec<Line>);
 
 impl<T: Into<String>> From<T> for Block {
     fn from(v: T) -> Self {
@@ -79,7 +109,7 @@ impl fmt::Display for Block {
 }
 
 impl Block {
-    fn write_to(&self, f: &mut fmt::Formatter, prefix: &str) -> fmt::Result {
+    pub fn write_to(&self, f: &mut fmt::Formatter, prefix: &str) -> fmt::Result {
         let mut first_line = true;
         for line in &self.0 {
             if !first_line {
@@ -89,6 +119,12 @@ impl Block {
             line.write_to(f, prefix)?;
         }
         Ok(())
+    }
+
+    pub fn set_placeholder(&mut self, placeholder_name: &str, content: &Block) {
+        for line in &mut self.0 {
+            line.set_placeholder(placeholder_name, content);
+        }
     }
 }
 
@@ -129,6 +165,25 @@ mod tests {
         assert_eq!(
             s,
             include_str!("./snapshots/block.outputs_a_block_with_correct_indentation.txt")
+        );
+    }
+
+    #[test]
+    fn replaces_a_placeholder() {
+        let mut block = Block(vec![Line(vec![
+            LineSegment::from("A"),
+            LineSegment::Placeholder(String::from("x")),
+            LineSegment::from("C"),
+        ])]);
+        block.set_placeholder("x", &Block(vec![Line(vec![LineSegment::from("B")])]));
+
+        assert_eq!(
+            block,
+            Block(vec![Line(vec![
+                LineSegment::from("A"),
+                LineSegment::Block(Block(vec![Line(vec![LineSegment::from("B"),])])),
+                LineSegment::from("C"),
+            ])])
         );
     }
 }

@@ -1,3 +1,4 @@
+use block::{Block, Line, LineSegment};
 use pest::iterators::Pair;
 use pest::Parser;
 
@@ -95,6 +96,24 @@ impl<'a> From<Pair<'a, Rule>> for Template {
     }
 }
 
+impl<'a> From<&'a Template> for Block {
+    fn from(t: &'a Template) -> Block {
+        let mut lines: Vec<Line> = Vec::with_capacity(t.lines.len());
+        for template_line in &t.lines {
+            let mut segments: Vec<LineSegment> =
+                Vec::with_capacity(template_line.content.len() + 1);
+            for template_segment in &template_line.content {
+                segments.push(match template_segment {
+                    Segment::Placeholder(x) => LineSegment::Placeholder(x.clone()),
+                    Segment::Content(x) => LineSegment::Content(x.clone()),
+                })
+            }
+            lines.push(Line(segments));
+        }
+        Block(lines)
+    }
+}
+
 #[derive(Debug)]
 struct File {
     templates: Vec<Template>,
@@ -110,6 +129,17 @@ impl<'a> From<Pair<'a, Rule>> for File {
             }
         }
         File { templates: v }
+    }
+}
+
+impl File {
+    fn get_template_block(&self, template_name: &str) -> Option<Block> {
+        for t in &self.templates {
+            if t.name == template_name {
+                return Some(t.into());
+            }
+        }
+        None
     }
 }
 
@@ -143,5 +173,10 @@ template2 =
             file.templates[1].lines[1].content[0],
             Segment::Content(String::from("another line"))
         );
+
+        let template = file
+            .get_template_block("template2")
+            .expect("template2 should exist");
+        println!("-----\n{}\n-----", template);
     }
 }
