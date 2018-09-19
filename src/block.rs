@@ -126,6 +126,16 @@ impl Block {
             line.set_placeholder(placeholder_name, content);
         }
     }
+
+    /// Join multiple blocks into a single block
+    pub fn join(blocks: Vec<Block>) -> Block {
+        Block(
+            blocks
+                .into_iter()
+                .map(|block| Line(vec![LineSegment::Block(block)]))
+                .collect(),
+        )
+    }
 }
 
 #[cfg(test)]

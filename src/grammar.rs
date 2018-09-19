@@ -99,9 +99,19 @@ impl<'a> From<Pair<'a, Rule>> for Template {
 impl<'a> From<&'a Template> for Block {
     fn from(t: &'a Template) -> Block {
         let mut lines: Vec<Line> = Vec::with_capacity(t.lines.len());
+        let indent_ignored = t.indent_ignored;
+
         for template_line in &t.lines {
             let mut segments: Vec<LineSegment> =
                 Vec::with_capacity(template_line.content.len() + 1);
+
+            // Add correct amount of whitespace at the beginning of the block
+            let indentation_len = template_line.indentation.len();
+            if indentation_len > indent_ignored {
+                let indentation: &str = &template_line.indentation[indent_ignored..];
+                segments.push(LineSegment::Content(String::from(indentation)));
+            }
+
             for template_segment in &template_line.content {
                 segments.push(match template_segment {
                     Segment::Placeholder(x) => LineSegment::Placeholder(x.clone()),
@@ -115,7 +125,7 @@ impl<'a> From<&'a Template> for Block {
 }
 
 #[derive(Debug)]
-struct File {
+pub struct File {
     templates: Vec<Template>,
 }
 
@@ -133,7 +143,19 @@ impl<'a> From<Pair<'a, Rule>> for File {
 }
 
 impl File {
-    fn get_template_block(&self, template_name: &str) -> Option<Block> {
+    pub fn parse(content: &str) -> File {
+        let result = GrammarParser::parse(Rule::file, content);
+
+        match result {
+            Err(e) => {
+                println!("Parse error: {}", e);
+                panic!();
+            }
+            Ok(mut r) => r.next().unwrap().into(),
+        }
+    }
+
+    pub fn get_template_block(&self, template_name: &str) -> Option<Block> {
         for t in &self.templates {
             if t.name == template_name {
                 return Some(t.into());
