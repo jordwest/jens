@@ -35,18 +35,33 @@ fn main() {
         t.set_placeholder("logger", &logger);
         t
     };
+
+    let logger = |functions: Block| {
+        let mut t = file.get_template_block("logger").unwrap();
+        t.set_placeholder("functions", &functions);
+        t
+    };
+
+    let log_function = |key: &str, map_name: &str| {
+        let mut t = file.get_template_block("log_function").unwrap();
+        t.set_placeholder("key", &Block::from(key));
+        t.set_placeholder("map", &Block::from(map_name));
+        t
+    };
     //////////////
 
     let output = template(
         map(
             "EMOJI_MAP",
-            Block::join(emoji.into_iter().map(emoji_entry).collect()),
+            Block::join(emoji.clone().into_iter().map(emoji_entry).collect()),
         ),
-        Block::from("// Logger not implemented yet"),
+        logger(Block::join(
+            emoji
+                .into_iter()
+                .map(|(key, _)| log_function(key, "EMOJI_MAP"))
+                .collect(),
+        )),
     );
 
-    // template.replace("MAP", "EMOJI_MAP");
-    // template.repeat_template("MapEntry", &emoji, &emoji_entry);
-    // template.repeat_template("PrintFunction", &emoji, &emoji_entry);
     println!("{}", output);
 }
