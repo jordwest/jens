@@ -71,7 +71,7 @@ impl Line {
         Ok(())
     }
 
-    pub fn set_placeholder(&mut self, placeholder_name: &str, content: &Block) {
+    pub fn set(&mut self, placeholder_name: &str, content: &Block) {
         for segment in &mut self.0 {
             match segment.clone() {
                 LineSegment::Placeholder(ref name) if name == placeholder_name => {
@@ -80,13 +80,6 @@ impl Line {
                 _ => (),
             }
         }
-        // let segments: Vec<LineSegment> = self
-        //     .0
-        //     .into_iter()
-        //     .map(|ref mut s| match s {
-        //     }).collect();
-
-        // self.0 = segments;
     }
 }
 
@@ -121,10 +114,25 @@ impl Block {
         Ok(())
     }
 
-    pub fn set_placeholder(&mut self, placeholder_name: &str, content: &Block) {
+    pub fn set<T: Into<Block>>(mut self, placeholder_name: &str, content: T) -> Self {
+        let content: &Block = &content.into();
         for line in &mut self.0 {
-            line.set_placeholder(placeholder_name, content);
+            line.set(placeholder_name, content);
         }
+        self
+    }
+
+    /// Repeat a template for each element of some iterable value
+    pub fn for_each<T: IntoIterator<Item = U>, U>(
+        self,
+        iter: T,
+        mapper: fn(U, Block) -> Block,
+    ) -> Self {
+        Block::join(
+            iter.into_iter()
+                .map(|item| mapper(item, self.clone()))
+                .collect(),
+        )
     }
 
     /// Join multiple blocks into a single block
@@ -180,12 +188,12 @@ mod tests {
 
     #[test]
     fn replaces_a_placeholder() {
-        let mut block = Block(vec![Line(vec![
+        let block = Block(vec![Line(vec![
             LineSegment::from("A"),
             LineSegment::Placeholder(String::from("x")),
             LineSegment::from("C"),
         ])]);
-        block.set_placeholder("x", &Block(vec![Line(vec![LineSegment::from("B")])]));
+        let block = block.set("x", Block(vec![Line(vec![LineSegment::from("B")])]));
 
         assert_eq!(
             block,

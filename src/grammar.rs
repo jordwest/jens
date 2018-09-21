@@ -155,13 +155,19 @@ impl File {
         }
     }
 
-    pub fn get_template_block(&self, template_name: &str) -> Option<Block> {
+    /// Find a template in the template definition file.
+    pub fn template_opt(&self, template_name: &str) -> Option<Block> {
         for t in &self.templates {
             if t.name == template_name {
                 return Some(t.into());
             }
         }
         None
+    }
+
+    /// Find a template in the template definition file. Panics if not found.
+    pub fn template(&self, template_name: &str) -> Block {
+        self.template_opt(template_name).unwrap()
     }
 }
 
@@ -197,7 +203,7 @@ template2 =
         );
 
         let template = file
-            .get_template_block("template2")
+            .template_opt("template2")
             .expect("template2 should exist");
         println!("-----\n{}\n-----", template);
     }

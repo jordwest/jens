@@ -1,6 +1,5 @@
 extern crate jens;
 
-use jens::block::Block;
 use jens::grammar::File;
 
 fn main() {
@@ -11,57 +10,29 @@ fn main() {
         ("robot", "🤖"),
     ];
 
-    let file = File::parse(include_str!("./emoji.jens"));
+    let f = File::parse(include_str!("./emoji.jens"));
 
-    //////////////
-    // The following boilerplatey functions could disappear if we used procedural macros
-    let emoji_entry = |(key, value): (&str, &str)| -> Block {
-        let mut t = file.get_template_block("key_value").unwrap();
-        t.set_placeholder("key", &Block::from(key));
-        t.set_placeholder("value", &Block::from(value));
-        t
-    };
-
-    let map = |name: &str, entries: Block| {
-        let mut t = file.get_template_block("map").unwrap();
-        t.set_placeholder("name", &Block::from(name));
-        t.set_placeholder("entries", &entries);
-        t
-    };
-
-    let template = |map: Block, logger: Block| {
-        let mut t = file.get_template_block("main").unwrap();
-        t.set_placeholder("map", &map);
-        t.set_placeholder("logger", &logger);
-        t
-    };
-
-    let logger = |functions: Block| {
-        let mut t = file.get_template_block("logger").unwrap();
-        t.set_placeholder("functions", &functions);
-        t
-    };
-
-    let log_function = |key: &str, map_name: &str| {
-        let mut t = file.get_template_block("log_function").unwrap();
-        t.set_placeholder("key", &Block::from(key));
-        t.set_placeholder("map", &Block::from(map_name));
-        t
-    };
-    //////////////
-
-    let output = template(
-        map(
-            "EMOJI_MAP",
-            Block::join(emoji.clone().into_iter().map(emoji_entry).collect()),
-        ),
-        logger(Block::join(
-            emoji
-                .into_iter()
-                .map(|(key, _)| log_function(key, "EMOJI_MAP"))
-                .collect(),
-        )),
-    );
+    let output = f
+        .template("main")
+        .set(
+            "map",
+            f.template("map").set("name", "EMOJI_MAP").set(
+                "entries",
+                f.template("key_value")
+                    .for_each(&emoji, |&(key, val), block| {
+                        block.set("key", key).set("value", val)
+                    }),
+            ),
+        ).set(
+            "logger",
+            f.template("logger").set(
+                "functions",
+                f.template("log_function")
+                    .for_each(&emoji, |&(key, _), block| {
+                        block.set("key", key).set("map", "EMOJI_MAP")
+                    }),
+            ),
+        );
 
     println!("{}", output);
 }
