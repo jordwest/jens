@@ -16,7 +16,7 @@ impl Json {
             JsString => "string".into(),
             JsNumber => "number".into(),
             JsArray(subtype) => format!("{}[]", subtype.get_ts_type()),
-            JsObject(subtype) => format!("{}.T", subtype),
+            JsObject(module_name) => format!("{}.T", module_name),
         }
     }
 
@@ -26,7 +26,7 @@ impl Json {
             JsString => format!("noop"),
             JsNumber => format!("noop"),
             JsArray(subtype) => format!("serialize_array({})", subtype.get_serialize_func()),
-            JsObject(subtype) => format!("{}.serialize", subtype),
+            JsObject(module_name) => format!("{}.serialize", module_name),
         }
     }
 
@@ -36,7 +36,7 @@ impl Json {
             JsString => format!("deserialize_string"),
             JsNumber => format!("deserialize_number"),
             JsArray(subtype) => format!("deserialize_array({})", subtype.get_deserialize_func()),
-            JsObject(subtype) => format!("{}.deserialize", subtype),
+            JsObject(module_name) => format!("{}.deserialize", module_name),
         }
     }
 }
