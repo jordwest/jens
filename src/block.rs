@@ -123,11 +123,11 @@ impl Block {
     }
 
     /// Repeat a template for each element of some iterable value
-    pub fn for_each<T: IntoIterator<Item = U>, U>(
-        self,
-        iter: T,
-        mapper: fn(U, Block) -> Block,
-    ) -> Self {
+    pub fn for_each<T, U, F>(self, iter: T, mapper: F) -> Self
+    where
+        T: IntoIterator<Item = U>,
+        F: Fn(U, Block) -> Block,
+    {
         Block::join(
             iter.into_iter()
                 .map(|item| mapper(item, self.clone()))
