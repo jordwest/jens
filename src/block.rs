@@ -1,5 +1,20 @@
 use std::fmt;
 
+/// When mapping over an iterable, this returns the location of the current iteration
+pub enum IteratorLocation {
+    /// This item is the first item in the iterable
+    First,
+
+    /// This item is not the first or last item, but the nth item
+    Nth(usize),
+
+    /// This item is the last in the iterable
+    Last,
+
+    /// This item is the only item in the iterable (ie, the first AND last)
+    Only,
+}
+
 /// Replace every character in a string with a space, but preserve tabs
 fn replace_chars_with_whitespace(line: &str) -> String {
     let mut out = String::with_capacity(line.len());
@@ -102,6 +117,10 @@ impl fmt::Display for Block {
 }
 
 impl Block {
+    pub fn empty() -> Self {
+        Block(vec![])
+    }
+
     pub fn write_to(&self, f: &mut fmt::Formatter, prefix: &str) -> fmt::Result {
         let mut first_line = true;
         for line in &self.0 {
@@ -122,21 +141,44 @@ impl Block {
         self
     }
 
+    /// Run a function that maps over each item in an iterator, then join the results.
+    /// Provides an `IteratorLocation` for checking whether the
+    /// current item is the first/last/only/nth item in the list.
+    pub fn join_map<T, U, F>(iter: T, mapper: F) -> Self
+    where
+        T: IntoIterator<Item = U>,
+        F: Fn(U, IteratorLocation) -> Block,
+    {
+        let items: Vec<U> = iter.into_iter().collect();
+        let count = items.len();
+        match count {
+            0 => Block::empty(),
+            1 => mapper(items.into_iter().next().unwrap(), IteratorLocation::Only),
+            count => Block::join(items.into_iter().enumerate().map(|(i, item)| {
+                let loc = match (i, count) {
+                    (0, _) => IteratorLocation::First,
+                    (x, y) if x == y => IteratorLocation::Last,
+                    (x, _) => IteratorLocation::Nth(x),
+                };
+                mapper(item, loc)
+            })),
+        }
+    }
+
     /// Repeat a template for each element of some iterable value
     pub fn for_each<T, U, F>(self, iter: T, mapper: F) -> Self
     where
         T: IntoIterator<Item = U>,
         F: Fn(U, Block) -> Block,
     {
-        Block::join(
-            iter.into_iter()
-                .map(|item| mapper(item, self.clone()))
-                .collect(),
-        )
+        Block::join(iter.into_iter().map(|item| mapper(item, self.clone())))
     }
 
     /// Join multiple blocks into a single block
-    pub fn join(blocks: Vec<Block>) -> Block {
+    pub fn join<T>(blocks: T) -> Block
+    where
+        T: IntoIterator<Item = Block>,
+    {
         Block(
             blocks
                 .into_iter()
