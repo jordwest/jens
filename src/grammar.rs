@@ -11,6 +11,7 @@ enum Segment {
 impl<'a> From<Pair<'a, Rule>> for Segment {
     fn from(pair: Pair<'a, Rule>) -> Segment {
         match pair.as_rule() {
+            Rule::escaped_dollar => Segment::Content(String::from("$")),
             Rule::not_placeholder => Segment::Content(String::from(pair.as_str())),
             Rule::placeholder => {
                 Segment::Placeholder(String::from(pair.into_inner().next().unwrap().as_str()))
@@ -19,6 +20,9 @@ impl<'a> From<Pair<'a, Rule>> for Segment {
         }
     }
 }
+
+#[cfg(debug_assertions)]
+const _GRAMMAR: &'static str = include_str!("grammar.pest"); // relative to this file
 
 #[derive(Parser)]
 #[grammar = "grammar.pest"]
@@ -181,7 +185,7 @@ mod tests {
 
 template2 =
   a line without a placeholder
-  another line
+  but with an \\${escaped} dollar sign
 --
 ";
 
@@ -198,8 +202,12 @@ template2 =
         assert_eq!(file.templates[1].name, "template2");
         assert_eq!(file.templates[1].indent_ignored, 2);
         assert_eq!(
-            file.templates[1].lines[1].content[0],
-            Segment::Content(String::from("another line"))
+            file.templates[1].lines[1].content,
+            vec![
+                Segment::Content(String::from("but with an ")),
+                Segment::Content(String::from("$")),
+                Segment::Content(String::from("{escaped} dollar sign"))
+            ]
         );
 
         let template = file
