@@ -1,7 +1,6 @@
 extern crate jens;
 
-use jens::block::Block;
-use jens::grammar::File;
+use jens::{Block, File};
 
 enum Json {
     JsString,

@@ -2,5 +2,8 @@ extern crate pest;
 #[macro_use]
 extern crate pest_derive;
 
-pub mod block;
-pub mod grammar;
+pub use block::{Block, Line};
+pub use grammar::File;
+
+mod block;
+mod grammar;

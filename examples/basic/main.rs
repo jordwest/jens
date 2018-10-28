@@ -1,6 +1,6 @@
 extern crate jens;
 
-use jens::{block::Block, grammar::File};
+use jens::{Block, File};
 
 fn main() {
     let emoji: Vec<(&str, &str)> = vec![
