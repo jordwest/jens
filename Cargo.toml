@@ -3,7 +3,10 @@ name = "jens"
 description = "Readable templates for code generation"
 license = "MIT/Apache-2.0"
 version = "0.4.0"
-authors = ["Jordan West <jordwest@gmail.com>"]
+authors = [
+    "Jordan West <jordwest@gmail.com>",
+    "Josh Leeb-du Toit <josh.leebdutoit@gmail.com>"
+]
 repository = "https://github.com/jordwest/jens"
 
 [dependencies]
