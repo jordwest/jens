@@ -52,6 +52,7 @@ struct TsType {
 }
 
 fn main() {
+    // A sample Json object schema
     let types = vec![
         TsType {
             type_name: "Book".into(),
