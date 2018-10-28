@@ -93,7 +93,7 @@ fn main() {
         },
     ];
 
-    let f = File::parse(include_str!("./template.jens"));
+    let f = File::parse(include_str!("./template.jens")).unwrap();
 
     let output = f.template("main").set(
         "types",
