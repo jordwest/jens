@@ -97,8 +97,8 @@ fn main() {
 
     let output = f.template("main").set(
         "types",
-        f.template("type").for_each(types, |t, block| {
-            block
+        Block::join_map(types, |t, _| {
+            f.template("type")
                 .set("type_name", t.type_name.clone())
                 .set("type_def_fields", type_def_fields(&f, &t))
                 .set("serialize_fields", serialize_fields(&f, &t))
@@ -110,27 +110,25 @@ fn main() {
 }
 
 fn type_def_fields(f: &File, t: &TsType) -> Block {
-    f.template("type_def").for_each(&t.fields, |field, block| {
-        block
+    Block::join_map(&t.fields, |field, _| {
+        f.template("type_def")
             .set("field_name", field.field_name.clone())
             .set("field_type", field.field_type.get_ts_type())
     })
 }
 
 fn serialize_fields(f: &File, t: &TsType) -> Block {
-    f.template("serialize_field")
-        .for_each(&t.fields, |field, block| {
-            block
-                .set("field_name", field.field_name.clone())
-                .set("serialize_func", field.field_type.get_serialize_func())
-        })
+    Block::join_map(&t.fields, |field, _| {
+        f.template("serialize_field")
+            .set("field_name", field.field_name.clone())
+            .set("serialize_func", field.field_type.get_serialize_func())
+    })
 }
 
 fn deserialize_fields(f: &File, t: &TsType) -> Block {
-    f.template("deserialize_field")
-        .for_each(&t.fields, |field, block| {
-            block
-                .set("field_name", field.field_name.clone())
-                .set("deserialize_func", field.field_type.get_deserialize_func())
-        })
+    Block::join_map(&t.fields, |field, _| {
+        f.template("deserialize_field")
+            .set("field_name", field.field_name.clone())
+            .set("deserialize_func", field.field_type.get_deserialize_func())
+    })
 }

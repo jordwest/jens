@@ -142,8 +142,9 @@ impl Block {
     }
 
     /// Run a function that maps over each item in an iterator, then join the results.
-    /// Provides an `IteratorLocation` for checking whether the
-    /// current item is the first/last/only/nth item in the list.
+    ///
+    /// Provides an `IteratorLocation` for checking whether the current item is the
+    /// first/last/only/nth item in the list.
     pub fn join_map<T, U, F>(iter: T, mapper: F) -> Self
     where
         T: IntoIterator<Item = U>,
@@ -165,7 +166,10 @@ impl Block {
         }
     }
 
-    /// Repeat a template for each element of some iterable value
+    /// Repeat a template for each element of some iterable value.
+    ///
+    /// Deprecated in favor of `join_map`.
+    #[deprecated]
     pub fn for_each<T, U, F>(self, iter: T, mapper: F) -> Self
     where
         T: IntoIterator<Item = U>,

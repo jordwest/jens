@@ -1,6 +1,6 @@
 extern crate jens;
 
-use jens::grammar::File;
+use jens::{block::Block, grammar::File};
 
 fn main() {
     let emoji: Vec<(&str, &str)> = vec![
@@ -18,19 +18,20 @@ fn main() {
             "map",
             f.template("map").set("name", "EMOJI_MAP").set(
                 "entries",
-                f.template("key_value")
-                    .for_each(&emoji, |&(key, val), block| {
-                        block.set("key", key).set("value", val)
-                    }),
+                Block::join_map(&emoji, |&(key, val), _| {
+                    f.template("key_value").set("key", key).set("value", val)
+                }),
             ),
-        ).set(
+        )
+        .set(
             "logger",
             f.template("logger").set(
                 "functions",
-                f.template("log_function")
-                    .for_each(&emoji, |&(key, _), block| {
-                        block.set("key", key).set("map", "EMOJI_MAP")
-                    }),
+                Block::join_map(&emoji, |&(key, _), _| {
+                    f.template("log_function")
+                        .set("key", key)
+                        .set("map", "EMOJI_MAP")
+                }),
             ),
         );
 
