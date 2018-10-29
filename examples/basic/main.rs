@@ -10,7 +10,7 @@ fn main() {
         ("robot", "🤖"),
     ];
 
-    let f = File::parse(include_str!("./emoji.jens"));
+    let f = File::parse(include_str!("./emoji.jens")).unwrap();
 
     let output = f
         .template("main")

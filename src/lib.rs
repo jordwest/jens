@@ -3,7 +3,8 @@ extern crate pest;
 extern crate pest_derive;
 
 pub use block::{Block, IteratorLocation, Line, LineSegment};
-pub use grammar::File;
+pub use file::File;
 
 mod block;
-mod grammar;
+mod file;
+mod parser;
