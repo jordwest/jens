@@ -8,7 +8,7 @@ template_empty_line = { "\n" }
 template_content = { (!newline ~ any)* }
 template_line = { significant_whitespace ~ template_content ~ newline }
 template_decl = { identifier ~ wsp ~ "=" ~ wsp }
-template_terminator = { "-"+ ~ newline }
+template_terminator = { "-"+ ~ (newline | eoi) }
 template = { template_decl ~ newline ~ (template_line | template_empty_line)* ~ template_terminator }
 
 file = { soi ~ (template | newline)* ~ eoi }

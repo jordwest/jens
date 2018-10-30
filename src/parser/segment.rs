@@ -7,18 +7,19 @@ pub(crate) enum Segment {
     Placeholder(String),
 }
 
-// TODO: Segment::from - refactoring
 impl From<Pair<'_, Rule>> for Segment {
     fn from(pair: Pair<'_, Rule>) -> Self {
         match pair.as_rule() {
             Rule::escaped_dollar => Segment::Content("$".into()),
             Rule::not_placeholder => Segment::Content(pair.as_str().into()),
-            Rule::placeholder => {
-                Segment::Placeholder(pair.into_inner().next().unwrap().as_str().into())
-            }
+            Rule::placeholder => Segment::Placeholder(get_ident(pair)),
             _ => unreachable!(),
         }
     }
+}
+
+fn get_ident(pair: Pair<'_, Rule>) -> String {
+    pair.into_inner().nth(0).unwrap().as_str().into()
 }
 
 #[cfg(test)]
@@ -26,9 +27,8 @@ mod tests {
     use super::*;
     use crate::parser::parse;
 
-    // TODO: segment - Remove need for trailing newline.
     fn tmpl_line(content: &str) -> String {
-        format!("main =\n    {}\n----\n", content)
+        format!("main =\n    {}\n----", content)
     }
 
     #[test]
