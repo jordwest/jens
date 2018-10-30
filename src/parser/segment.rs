@@ -7,15 +7,62 @@ pub(crate) enum Segment {
     Placeholder(String),
 }
 
-impl<'a> From<Pair<'a, Rule>> for Segment {
-    fn from(pair: Pair<'a, Rule>) -> Segment {
+// TODO: Segment::from - refactoring
+impl From<Pair<'_, Rule>> for Segment {
+    fn from(pair: Pair<'_, Rule>) -> Self {
         match pair.as_rule() {
-            Rule::escaped_dollar => Segment::Content(String::from("$")),
-            Rule::not_placeholder => Segment::Content(String::from(pair.as_str())),
+            Rule::escaped_dollar => Segment::Content("$".into()),
+            Rule::not_placeholder => Segment::Content(pair.as_str().into()),
             Rule::placeholder => {
-                Segment::Placeholder(String::from(pair.into_inner().next().unwrap().as_str()))
+                Segment::Placeholder(pair.into_inner().next().unwrap().as_str().into())
             }
-            unknown => panic!("Unexpected rule '{:?}' found", unknown),
+            _ => unreachable!(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::parser::parse;
+
+    // TODO: segment - Remove need for trailing newline.
+    fn tmpl_line(content: &str) -> String {
+        format!("main =\n    {}\n----\n", content)
+    }
+
+    #[test]
+    fn placeholder() {
+        let templates = parse(&tmpl_line("${x}")).unwrap();
+        let segments = &templates[0].lines[0].content;
+
+        assert_eq!(segments, &[Segment::Placeholder("x".into())]);
+    }
+
+    #[test]
+    fn content() {
+        let templates = parse(&tmpl_line("content")).unwrap();
+        let segments = &templates[0].lines[0].content;
+
+        assert_eq!(segments, &[Segment::Content("content".into())]);
+    }
+
+    #[test]
+    fn escaped_dollar() {
+        let templates = parse(&tmpl_line("\\$")).unwrap();
+        let segments = &templates[0].lines[0].content;
+
+        assert_eq!(segments, &[Segment::Content("$".into())]);
+    }
+
+    #[test]
+    fn escaped_placeholder() {
+        let templates = parse(&tmpl_line("\\${x}")).unwrap();
+        let segments = &templates[0].lines[0].content;
+
+        assert_eq!(
+            segments,
+            &[Segment::Content("$".into()), Segment::Content("{x}".into())]
+        );
     }
 }

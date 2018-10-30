@@ -1,16 +1,14 @@
-use self::template::Template;
+use self::{segment::Segment, template::Template};
 use pest::{self, Parser};
 
+pub(crate) mod segment;
 pub(crate) mod template;
 
-mod segment;
-mod template_line;
-
 #[cfg(debug_assertions)]
-const _GRAMMAR: &'static str = include_str!("grammar.pest"); // relative to this file
+const _GRAMMAR: &'static str = include_str!("parser/grammar.pest"); // relative to this file
 
 #[derive(Parser)]
-#[grammar = "grammar.pest"]
+#[grammar = "parser/grammar.pest"]
 struct GrammarParser;
 
 pub(crate) fn parse(content: &str) -> Result<Vec<Template>, pest::Error<Rule>> {
@@ -28,10 +26,17 @@ pub(crate) fn parse(content: &str) -> Result<Vec<Template>, pest::Error<Rule>> {
         })
 }
 
+// TODO: parse_phase2 - Do better.
+pub(crate) fn parse_phase2(content: &str) -> Result<Vec<Segment>, pest::Error<Rule>> {
+    GrammarParser::parse(Rule::template_phase2, content)
+        .and_then(|mut pairs| Ok(pairs.next().unwrap()))
+        .and_then(|pairs| Ok(pairs.into_inner().map(Segment::from).collect()))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::parser::{segment::Segment, template_line::TemplateLine};
+    use crate::parser::{segment::Segment, template::TemplateLine};
 
     const TEST_TEMPLATE: &str = "template1 =
     line 1 with ${placeholder} in the middle

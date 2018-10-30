@@ -1,3 +1,4 @@
+use crate::parser::{segment::Segment, template::Template};
 use std::fmt;
 
 /// When mapping over an iterable, this returns the location of the current iteration
@@ -189,6 +190,34 @@ impl Block {
                 .map(|block| Line(vec![LineSegment::Block(block)]))
                 .collect(),
         )
+    }
+}
+
+impl<'a> From<&'a Template> for Block {
+    fn from(t: &'a Template) -> Self {
+        let mut lines: Vec<Line> = Vec::with_capacity(t.lines.len());
+        let indent_ignored = t.indent_ignored;
+
+        for template_line in &t.lines {
+            let mut segments: Vec<LineSegment> =
+                Vec::with_capacity(template_line.content.len() + 1);
+
+            // Add correct amount of whitespace at the beginning of the block
+            let indentation_len = template_line.indentation.len();
+            if indentation_len > indent_ignored {
+                let indentation: &str = &template_line.indentation[indent_ignored..];
+                segments.push(LineSegment::Content(String::from(indentation)));
+            }
+
+            for template_segment in &template_line.content {
+                segments.push(match template_segment {
+                    Segment::Placeholder(x) => LineSegment::Placeholder(x.clone()),
+                    Segment::Content(x) => LineSegment::Content(x.clone()),
+                })
+            }
+            lines.push(Line(segments));
+        }
+        Block(lines)
     }
 }
 
