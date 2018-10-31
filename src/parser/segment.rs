@@ -1,4 +1,4 @@
-use crate::parser::Rule;
+use crate::parser::{get_ident, Rule};
 use pest::iterators::Pair;
 
 #[derive(Debug, PartialEq)]
@@ -18,10 +18,6 @@ impl From<Pair<'_, Rule>> for Segment {
     }
 }
 
-fn get_ident(pair: Pair<'_, Rule>) -> String {
-    pair.into_inner().nth(0).unwrap().as_str().into()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -34,15 +30,15 @@ mod tests {
     #[test]
     fn placeholder() {
         let templates = parse(&tmpl_line("${x}")).unwrap();
-        let segments = &templates[0].lines[0].content;
+        let segments = &templates[0].lines[0].segments;
 
         assert_eq!(segments, &[Segment::Placeholder("x".into())]);
     }
 
     #[test]
-    fn content() {
+    fn raw_content() {
         let templates = parse(&tmpl_line("content")).unwrap();
-        let segments = &templates[0].lines[0].content;
+        let segments = &templates[0].lines[0].segments;
 
         assert_eq!(segments, &[Segment::Content("content".into())]);
     }
@@ -50,7 +46,7 @@ mod tests {
     #[test]
     fn escaped_dollar() {
         let templates = parse(&tmpl_line("\\$")).unwrap();
-        let segments = &templates[0].lines[0].content;
+        let segments = &templates[0].lines[0].segments;
 
         assert_eq!(segments, &[Segment::Content("$".into())]);
     }
@@ -58,7 +54,7 @@ mod tests {
     #[test]
     fn escaped_placeholder() {
         let templates = parse(&tmpl_line("\\${x}")).unwrap();
-        let segments = &templates[0].lines[0].content;
+        let segments = &templates[0].lines[0].segments;
 
         assert_eq!(
             segments,

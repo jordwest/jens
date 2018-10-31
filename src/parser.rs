@@ -1,5 +1,5 @@
 use self::{segment::Segment, template::Template};
-use pest::{self, Parser};
+use pest::{self, Parser, iterators::Pair};
 
 pub(crate) mod segment;
 pub(crate) mod template;
@@ -26,11 +26,16 @@ pub(crate) fn parse(content: &str) -> Result<Vec<Template>, pest::Error<Rule>> {
         })
 }
 
-// TODO: parse_phase2 - Do better.
+// TODO: parser::parse_phase2
+// Attempt to make the parsing single phase, otherwise clean up this function.
 pub(crate) fn parse_phase2(content: &str) -> Result<Vec<Segment>, pest::Error<Rule>> {
     GrammarParser::parse(Rule::template_phase2, content)
         .and_then(|mut pairs| Ok(pairs.next().unwrap()))
         .and_then(|pairs| Ok(pairs.into_inner().map(Segment::from).collect()))
+}
+
+pub(crate) fn get_ident(pair: Pair<'_, Rule>) -> String {
+    pair.into_inner().nth(0).unwrap().as_str().into()
 }
 
 #[cfg(test)]
@@ -58,7 +63,7 @@ template2 =
                     indent_ignored: 4,
                     lines: vec![TemplateLine {
                         indentation: "    ".into(),
-                        content: vec![
+                        segments: vec![
                             Segment::Content("line 1 with ".into()),
                             Segment::Placeholder("placeholder".into()),
                             Segment::Content(" in the middle".into()),
@@ -71,11 +76,11 @@ template2 =
                     lines: vec![
                         TemplateLine {
                             indentation: "  ".into(),
-                            content: vec![Segment::Content("a line without a placeholder".into())],
+                            segments: vec![Segment::Content("a line without a placeholder".into())],
                         },
                         TemplateLine {
                             indentation: "  ".into(),
-                            content: vec![
+                            segments: vec![
                                 Segment::Content("but with an ".into()),
                                 Segment::Content("$".into()),
                                 Segment::Content("{escaped} dollar sign".into()),

@@ -200,7 +200,7 @@ impl<'a> From<&'a Template> for Block {
 
         for template_line in &t.lines {
             let mut segments: Vec<LineSegment> =
-                Vec::with_capacity(template_line.content.len() + 1);
+                Vec::with_capacity(template_line.segments.len() + 1);
 
             // Add correct amount of whitespace at the beginning of the block
             let indentation_len = template_line.indentation.len();
@@ -209,7 +209,7 @@ impl<'a> From<&'a Template> for Block {
                 segments.push(LineSegment::Content(String::from(indentation)));
             }
 
-            for template_segment in &template_line.content {
+            for template_segment in &template_line.segments {
                 segments.push(match template_segment {
                     Segment::Placeholder(x) => LineSegment::Placeholder(x.clone()),
                     Segment::Content(x) => LineSegment::Content(x.clone()),
