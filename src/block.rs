@@ -159,7 +159,7 @@ impl Block {
             count => Block::join(items.into_iter().enumerate().map(|(i, item)| {
                 let loc = match (i, count) {
                     (0, _) => IteratorLocation::First,
-                    (x, y) if x == y => IteratorLocation::Last,
+                    (x, y) if x == y - 1 => IteratorLocation::Last,
                     (x, _) => IteratorLocation::Nth(x),
                 };
                 mapper(item, loc)
