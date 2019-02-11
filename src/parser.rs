@@ -1,17 +1,15 @@
 use self::{segment::Segment, template::Template};
-use pest::{self, Parser, iterators::Pair};
+use pest::{error::Error as PestError, iterators::Pair, Parser};
 
 pub(crate) mod segment;
 pub(crate) mod template;
 
-#[cfg(debug_assertions)]
-const _GRAMMAR: &'static str = include_str!("parser/grammar.pest"); // relative to this file
-
+// TODO: Rename to JensParser.
 #[derive(Parser)]
 #[grammar = "parser/grammar.pest"]
 struct GrammarParser;
 
-pub(crate) fn parse(content: &str) -> Result<Vec<Template>, pest::Error<Rule>> {
+pub(crate) fn parse(content: &str) -> Result<Vec<Template>, PestError<Rule>> {
     GrammarParser::parse(Rule::file, content)
         .and_then(|mut pairs| Ok(pairs.next().unwrap()))
         .and_then(|pair| {
@@ -28,7 +26,7 @@ pub(crate) fn parse(content: &str) -> Result<Vec<Template>, pest::Error<Rule>> {
 
 // TODO: parser::parse_phase2
 // Attempt to make the parsing single phase, otherwise clean up this function.
-pub(crate) fn parse_phase2(content: &str) -> Result<Vec<Segment>, pest::Error<Rule>> {
+pub(crate) fn parse_phase2(content: &str) -> Result<Vec<Segment>, PestError<Rule>> {
     GrammarParser::parse(Rule::template_phase2, content)
         .and_then(|mut pairs| Ok(pairs.next().unwrap()))
         .and_then(|pairs| Ok(pairs.into_inner().map(Segment::from).collect()))
