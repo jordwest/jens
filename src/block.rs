@@ -34,6 +34,7 @@ pub enum LineSegment {
     Content(String),
     Placeholder(String),
     Block(Block),
+    EndOfInput,
 }
 
 impl LineSegment {
@@ -45,6 +46,7 @@ impl LineSegment {
                 let prefix = replace_chars_with_whitespace(prefix);
                 b.write_to(f, &prefix)
             }
+            LineSegment::EndOfInput => Ok(()),
         }
     }
 
@@ -254,7 +256,7 @@ mod tests {
         ]);
 
         let mut s = String::new();
-        write!(&mut s, "{}", function);
+        write!(&mut s, "{}", function).unwrap();
         assert_eq!(
             s,
             include_str!("./snapshots/block.outputs_a_block_with_correct_indentation.txt")

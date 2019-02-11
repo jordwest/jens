@@ -1,4 +1,4 @@
-WHITESPACE = _{ ( " " | "\t" )* }
+wsp = _{ ( " " | "\t" )* }
 significant_whitespace = { ( " " | "\t" )+ }
 newline = _{ "\n" }
 
@@ -7,7 +7,7 @@ identifier = { ('A'..'z' | '0'..'9' | "_" )+ }
 template_empty_line = { "\n" }
 template_content = { (!newline ~ ANY)* }
 template_line = { significant_whitespace ~ template_content ~ newline }
-template_decl = { identifier ~ WHITESPACE ~ "=" ~ WHITESPACE }
+template_decl = { identifier ~ wsp ~ "=" ~ wsp }
 template_terminator = { "-"+ ~ (newline | EOI) }
 template = { template_decl ~ newline ~ (template_line | template_empty_line)* ~ template_terminator }
 

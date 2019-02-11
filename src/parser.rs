@@ -5,7 +5,6 @@ use pest_derive::Parser;
 pub(crate) mod segment;
 pub(crate) mod template;
 
-// TODO: Rename to JensParser.
 #[derive(Parser)]
 #[grammar = "parser/grammar.pest"]
 struct GrammarParser;
@@ -18,6 +17,7 @@ pub(crate) fn parse(content: &str) -> Result<Vec<Template>, PestError<Rule>> {
             for item in pair.into_inner() {
                 match item.as_rule() {
                     Rule::template => templates.push(Template::from(item)),
+                    Rule::EOI => {}
                     unknown => panic!("Unexpected rule '{:?}' found", unknown),
                 }
             }
@@ -30,7 +30,17 @@ pub(crate) fn parse(content: &str) -> Result<Vec<Template>, PestError<Rule>> {
 pub(crate) fn parse_phase2(content: &str) -> Result<Vec<Segment>, PestError<Rule>> {
     GrammarParser::parse(Rule::template_phase2, content)
         .and_then(|mut pairs| Ok(pairs.next().unwrap()))
-        .and_then(|pairs| Ok(pairs.into_inner().map(Segment::from).collect()))
+        .and_then(|pairs| {
+            Ok(pairs
+                .into_inner()
+                .filter_map(|pair| {
+                    if Rule::EOI == pair.as_rule() {
+                        return None;
+                    }
+                    Some(Segment::from(pair))
+                })
+                .collect())
+        })
 }
 
 pub(crate) fn get_ident(pair: Pair<'_, Rule>) -> String {
