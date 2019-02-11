@@ -1,12 +1,16 @@
 [package]
 name = "jens"
-description = "Readable templates for code generation"
-license = "MIT/Apache-2.0"
 version = "0.4.2"
 authors = [
     "Jordan West <jordwest@gmail.com>",
-    "Josh Leeb-du Toit <josh.leebdutoit@gmail.com>"
+    "Josh Leeb-du Toit <mail@joshleeb.com>",
 ]
+
+description = "Readable templates for code generation"
+documentation = "https://docs.rs/crate/jens/"
+keywords = ["codegen", "template"]
+license = "MIT/Apache-2.0"
+readme = "README.md"
 repository = "https://github.com/jordwest/jens"
 
 [dependencies]
