@@ -126,7 +126,7 @@ impl Block {
         let mut first_line = true;
         for line in &self.0 {
             if !first_line {
-                write!(f, "\n{}", prefix);
+                write!(f, "\n{}", prefix).unwrap();
             }
             first_line = false;
             line.write_to(f, prefix)?;

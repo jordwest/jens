@@ -1,5 +1,6 @@
 use self::{segment::Segment, template::Template};
 use pest::{error::Error as PestError, iterators::Pair, Parser};
+use pest_derive::Parser;
 
 pub(crate) mod segment;
 pub(crate) mod template;
