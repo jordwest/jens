@@ -58,123 +58,50 @@ mod tests {
 
     #[test]
     fn empty_template() {
+        use insta::assert_debug_snapshot_matches;
         let templates = parse("main =\n----").unwrap();
 
-        assert_eq!(
-            templates,
-            &[Template {
-                name: "main".into(),
-                indent_ignored: 4,
-                lines: vec![]
-            }]
-        );
+        assert_debug_snapshot_matches!("template.empty_template", templates);
     }
 
     #[test]
     fn space_indented_content() {
+        use insta::assert_debug_snapshot_matches;
         let templates = parse("main =\n    indent4\n     indent5\n----").unwrap();
 
-        assert_eq!(
-            templates,
-            &[Template {
-                name: "main".into(),
-                indent_ignored: 4,
-                lines: vec![
-                    TemplateLine {
-                        indentation: "    ".into(),
-                        segments: vec![Segment::Content("indent4".into())],
-                    },
-                    TemplateLine {
-                        indentation: "     ".into(),
-                        segments: vec![Segment::Content("indent5".into())],
-                    }
-                ]
-            }]
-        );
+        assert_debug_snapshot_matches!("template.indented_content", templates);
     }
 
     #[test]
     fn tab_indented() {
+        use insta::assert_debug_snapshot_matches;
         let templates = parse("main =\n\tindent1\n\t\tindent2\n-").unwrap();
 
-        assert_eq!(
-            templates,
-            &[Template {
-                name: "main".into(),
-                indent_ignored: 1,
-                lines: vec![
-                    TemplateLine {
-                        indentation: "\t".into(),
-                        segments: vec![Segment::Content("indent1".into())],
-                    },
-                    TemplateLine {
-                        indentation: "\t\t".into(),
-                        segments: vec![Segment::Content("indent2".into())],
-                    }
-                ]
-            }]
-        );
+        assert_debug_snapshot_matches!("template.tab_indented", templates);
     }
 
     #[test]
     fn mixed_indentation() {
+        use insta::assert_debug_snapshot_matches;
         let templates = parse("main =\n    \tindent\n----").unwrap();
 
-        assert_eq!(
-            templates,
-            &[Template {
-                name: "main".into(),
-                indent_ignored: 4,
-                lines: vec![TemplateLine {
-                    indentation: "    \t".into(),
-                    segments: vec![Segment::Content("indent".into())],
-                }]
-            }]
-        );
+        assert_debug_snapshot_matches!("template.mixed_indentation", templates);
     }
 
     #[test]
     fn ignore_more_indentation() {
+        use insta::assert_debug_snapshot_matches;
         let templates = parse("main =\n  content\n----").unwrap();
 
-        assert_eq!(
-            templates,
-            &[Template {
-                name: "main".into(),
-                indent_ignored: 4,
-                lines: vec![TemplateLine {
-                    indentation: "  ".into(),
-                    segments: vec![Segment::Content("content".into())],
-                }]
-            }]
-        );
+        assert_debug_snapshot_matches!("template.ignore_more_indentation", templates);
     }
 
     #[test]
     fn ignore_inner_template() {
+        use insta::assert_debug_snapshot_matches;
         let templates = parse("main =\n    main =\n        x\n    ----\n----").unwrap();
 
-        assert_eq!(
-            templates,
-            &[Template {
-                name: "main".into(),
-                indent_ignored: 4,
-                lines: vec![
-                    TemplateLine {
-                        indentation: "    ".into(),
-                        segments: vec![Segment::Content("main =".into())],
-                    },
-                    TemplateLine {
-                        indentation: "        ".into(),
-                        segments: vec![Segment::Content("x".into())],
-                    },
-                    TemplateLine {
-                        indentation: "    ".into(),
-                        segments: vec![Segment::Content("----".into())],
-                    }
-                ]
-            }]
-        );
+        assert_debug_snapshot_matches!("template.ignore_inner_template", templates);
     }
 
     #[test]

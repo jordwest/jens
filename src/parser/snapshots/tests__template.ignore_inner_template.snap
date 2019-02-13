@@ -1,0 +1,38 @@
+---
+created: "2019-02-13T07:58:06.314248Z"
+creator: insta@0.6.2
+source: src/parser/template.rs
+expression: templates
+---
+[
+    Template {
+        name: "main",
+        indent_ignored: 4,
+        lines: [
+            TemplateLine {
+                indentation: "    ",
+                segments: [
+                    Content(
+                        "main ="
+                    )
+                ]
+            },
+            TemplateLine {
+                indentation: "        ",
+                segments: [
+                    Content(
+                        "x"
+                    )
+                ]
+            },
+            TemplateLine {
+                indentation: "    ",
+                segments: [
+                    Content(
+                        "----"
+                    )
+                ]
+            }
+        ]
+    }
+]
