@@ -21,6 +21,7 @@ impl<'a> From<Pair<'a, Rule>> for Template {
                     template.indent_ignored = item.as_str().matches("-").count()
                 }
                 Rule::template_empty_line => template.lines.push(TemplateLine::default()),
+                Rule::EOI => {}
                 _ => unreachable!(),
             }
         }

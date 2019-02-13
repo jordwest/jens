@@ -11,7 +11,7 @@ template_decl = { identifier ~ wsp ~ "=" ~ wsp }
 template_terminator = { "-"+ ~ (newline | EOI) }
 template = { template_decl ~ newline ~ (template_line | template_empty_line)* ~ template_terminator }
 
-template_one_liner = { template_decl ~ template_content }
+template_one_liner = { template_decl ~ template_content ~ (newline | EOI) }
 
 file = { SOI ~ (template | newline | template_one_liner)* ~ EOI }
 
