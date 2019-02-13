@@ -56,14 +56,6 @@ type =
 
 --
 
-type_def =
-  ${field_name}: ${field_type},
---
-
-serialize_field =
-  ${field_name}: ${serialize_func}(t.${field_name}),
---
-
-deserialize_field =
-  ${field_name}: ${deserialize_func}(o['${field_name}']),
---
+type_def           = ${field_name}: ${field_type},
+serialize_field    = ${field_name}: ${serialize_func}(t.${field_name}),
+deserialize_field  = ${field_name}: ${deserialize_func}(o['${field_name}']),

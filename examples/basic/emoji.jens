@@ -10,9 +10,7 @@ map =
     }
 ----
 
-key_value =
-    "${key}": "${value}",
-----
+key_value = "${key}": "${value}",
 
 logger =
     var Logger = {
