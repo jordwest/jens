@@ -17,6 +17,7 @@ pub(crate) fn parse(content: &str) -> Result<Vec<Template>, PestError<Rule>> {
             for item in pair.into_inner() {
                 match item.as_rule() {
                     Rule::template => templates.push(Template::from(item)),
+                    Rule::template_one_liner => templates.push(Template::from(item)),
                     Rule::EOI => {}
                     unknown => panic!("Unexpected rule '{:?}' found", unknown),
                 }

@@ -14,6 +14,7 @@ impl<'a> From<Pair<'a, Rule>> for Template {
 
         for item in pair.into_inner() {
             match item.as_rule() {
+                Rule::template_content => template.lines.push(item.as_str().into()),
                 Rule::template_decl => template.name = get_ident(item),
                 Rule::template_line => template.lines.push(item.into()),
                 Rule::template_terminator => {
@@ -31,6 +32,15 @@ impl<'a> From<Pair<'a, Rule>> for Template {
 pub(crate) struct TemplateLine {
     pub(crate) indentation: String,
     pub(crate) segments: Vec<Segment>,
+}
+
+impl From<&str> for TemplateLine {
+    fn from(s: &str) -> TemplateLine {
+        TemplateLine {
+            indentation: "".into(),
+            segments: parse_phase2(s).unwrap(),
+        }
+    }
 }
 
 impl<'a> From<Pair<'a, Rule>> for TemplateLine {
@@ -78,6 +88,16 @@ mod tests {
         let templates = parse("main =\n\tindent1\n\t\tindent2\n-").unwrap();
 
         assert_debug_snapshot_matches!("template.tab_indented", templates);
+    }
+
+    #[test]
+    fn one_liner() {
+        use insta::assert_debug_snapshot_matches;
+        let templates =
+            parse("main =      this is a one-liner and white space at the beginning is ignored")
+                .unwrap();
+
+        assert_debug_snapshot_matches!("template.one_liner", templates);
     }
 
     #[test]

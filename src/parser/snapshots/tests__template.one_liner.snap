@@ -1,0 +1,22 @@
+---
+created: "2019-02-13T08:09:16.624806Z"
+creator: insta@0.6.2
+source: src/parser/template.rs
+expression: templates
+---
+[
+    Template {
+        name: "main",
+        indent_ignored: 0,
+        lines: [
+            TemplateLine {
+                indentation: "",
+                segments: [
+                    Content(
+                        "this is a one-liner and white space at the beginning is ignored"
+                    )
+                ]
+            }
+        ]
+    }
+]

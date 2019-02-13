@@ -11,7 +11,9 @@ template_decl = { identifier ~ wsp ~ "=" ~ wsp }
 template_terminator = { "-"+ ~ (newline | EOI) }
 template = { template_decl ~ newline ~ (template_line | template_empty_line)* ~ template_terminator }
 
-file = { SOI ~ (template | newline)* ~ EOI }
+template_one_liner = { template_decl ~ template_content }
+
+file = { SOI ~ (template | newline | template_one_liner)* ~ EOI }
 
 placeholder = { "${" ~ identifier ~ "}" }
 escaped_dollar = { "\\$" }
