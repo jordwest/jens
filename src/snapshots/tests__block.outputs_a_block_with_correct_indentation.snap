@@ -1,3 +1,9 @@
+---
+created: "2019-02-13T07:54:09.800459Z"
+creator: insta@0.6.2
+source: src/block.rs
+expression: s
+---
 function test(arg1: string,
               arg2: number,
               arg3: Object) {

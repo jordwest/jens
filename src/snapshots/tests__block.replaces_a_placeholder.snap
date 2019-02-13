@@ -1,0 +1,33 @@
+---
+created: "2019-02-13T07:54:09.800491Z"
+creator: insta@0.6.2
+source: src/block.rs
+expression: block
+---
+Block(
+    [
+        Line(
+            [
+                Content(
+                    "A"
+                ),
+                Block(
+                    Block(
+                        [
+                            Line(
+                                [
+                                    Content(
+                                        "B"
+                                    )
+                                ]
+                            )
+                        ]
+                    )
+                ),
+                Content(
+                    "C"
+                )
+            ]
+        )
+    ]
+)

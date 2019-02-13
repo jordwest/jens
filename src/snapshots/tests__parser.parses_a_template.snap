@@ -1,0 +1,56 @@
+---
+created: "2019-02-13T07:54:09.800525Z"
+creator: insta@0.6.2
+source: src/parser.rs
+expression: parse(TEST_TEMPLATE).unwrap()
+---
+[
+    Template {
+        name: "template1",
+        indent_ignored: 4,
+        lines: [
+            TemplateLine {
+                indentation: "    ",
+                segments: [
+                    Content(
+                        "line 1 with "
+                    ),
+                    Placeholder(
+                        "placeholder"
+                    ),
+                    Content(
+                        " in the middle"
+                    )
+                ]
+            }
+        ]
+    },
+    Template {
+        name: "template2",
+        indent_ignored: 2,
+        lines: [
+            TemplateLine {
+                indentation: "  ",
+                segments: [
+                    Content(
+                        "a line without a placeholder"
+                    )
+                ]
+            },
+            TemplateLine {
+                indentation: "  ",
+                segments: [
+                    Content(
+                        "but with an "
+                    ),
+                    Content(
+                        "$"
+                    ),
+                    Content(
+                        "{escaped} dollar sign"
+                    )
+                ]
+            }
+        ]
+    }
+]

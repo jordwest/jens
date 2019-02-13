@@ -64,40 +64,7 @@ template2 =
 
     #[test]
     fn parses_a_template() {
-        assert_eq!(
-            parse(TEST_TEMPLATE).unwrap(),
-            vec![
-                Template {
-                    name: "template1".into(),
-                    indent_ignored: 4,
-                    lines: vec![TemplateLine {
-                        indentation: "    ".into(),
-                        segments: vec![
-                            Segment::Content("line 1 with ".into()),
-                            Segment::Placeholder("placeholder".into()),
-                            Segment::Content(" in the middle".into()),
-                        ],
-                    },]
-                },
-                Template {
-                    name: "template2".into(),
-                    indent_ignored: 2,
-                    lines: vec![
-                        TemplateLine {
-                            indentation: "  ".into(),
-                            segments: vec![Segment::Content("a line without a placeholder".into())],
-                        },
-                        TemplateLine {
-                            indentation: "  ".into(),
-                            segments: vec![
-                                Segment::Content("but with an ".into()),
-                                Segment::Content("$".into()),
-                                Segment::Content("{escaped} dollar sign".into()),
-                            ]
-                        }
-                    ]
-                }
-            ]
-        );
+        use insta::assert_debug_snapshot_matches;
+        assert_debug_snapshot_matches!("parser.parses_a_template", parse(TEST_TEMPLATE).unwrap());
     }
 }

@@ -229,6 +229,7 @@ mod tests {
 
     #[test]
     fn outputs_a_block_with_correct_indentation() {
+        use insta::assert_snapshot_matches;
         use std::fmt::Write;
 
         let arg_list = Block(vec![
@@ -257,14 +258,12 @@ mod tests {
 
         let mut s = String::new();
         write!(&mut s, "{}", function).unwrap();
-        assert_eq!(
-            s,
-            include_str!("./snapshots/block.outputs_a_block_with_correct_indentation.txt")
-        );
+        assert_snapshot_matches!("block.outputs_a_block_with_correct_indentation", s);
     }
 
     #[test]
     fn replaces_a_placeholder() {
+        use insta::assert_debug_snapshot_matches;
         let block = Block(vec![Line(vec![
             LineSegment::from("A"),
             LineSegment::Placeholder(String::from("x")),
@@ -272,13 +271,6 @@ mod tests {
         ])]);
         let block = block.set("x", Block(vec![Line(vec![LineSegment::from("B")])]));
 
-        assert_eq!(
-            block,
-            Block(vec![Line(vec![
-                LineSegment::from("A"),
-                LineSegment::Block(Block(vec![Line(vec![LineSegment::from("B"),])])),
-                LineSegment::from("C"),
-            ])])
-        );
+        assert_debug_snapshot_matches!("block.replaces_a_placeholder", block);
     }
 }
