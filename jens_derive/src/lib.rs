@@ -2,6 +2,7 @@
 extern crate jens;
 
 use jens::File as JensFile;
+use jens::{Block, LineSegment};
 use quote::quote;
 use std::env;
 use std::fs::File;
@@ -67,22 +68,46 @@ pub fn derive_jens(input: TokenStream) -> TokenStream {
                         .iter()
                         .map(|p| {
                                 let ident = Ident::new(p, Span::call_site());
-                                quote! {#ident: Block}
+                                quote! {#ident: impl Into<Block>}
                         })
                         .collect();
+                let block: Block = t.into();
+                let lines: Vec<_> =
+                        block.0.iter()
+                                .map(|line| {
+                                        let segments: Vec<_> = line
+                                        .0
+                                        .iter()
+                                        .map(|segment| match segment {
+                                                LineSegment::EndOfInput => {
+                                                        quote! {LineSegment::EndOfInput}
+                                                }
+                                                LineSegment::Content(c) => {
+                                                        quote! {LineSegment::Content(#c.into())}
+                                                }
+                                                LineSegment::Placeholder(c) => {
+                                                        let ident =
+                                                                Ident::new(&c, Span::call_site());
+                                                        quote! {LineSegment::Block(#ident.into())}
+                                                },
+                                                LineSegment::Block(c) => {
+                                                        panic!("Unexpected block inside template");
+                                                },
+                                        })
+                                        .collect();
+                                        quote! { Line(vec![#(#segments),*]) }
+                                })
+                                .collect();
                 template_funcs.push(quote! {
-                        pub fn #func_ident(#(#args),*) {
-                                println!("Hello from {}", #func_name);
+                        pub fn #func_ident(#(#args),*) -> Block {
+                                Block(vec![#(#lines),*])
                         }
                 })
         }
 
         let expanded = quote! {
+            use jens::{Block, Line, LineSegment};
             impl #struct_ident {
-                pub fn say_hello() {
-                        let count = #count;
-                        println!("{}", count)
-                }
                 #(#template_funcs)*
             };
         };

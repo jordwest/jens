@@ -7,7 +7,7 @@ struct Xyz {}
 
 #[test]
 fn test_derive() {
-        Xyz::template1();
-        Xyz::template2();
+        let t1 = Xyz::template1();
+        println!("Template output:\n{}", Xyz::template2(t1, "Hullo"));
         println!("Works!");
 }
