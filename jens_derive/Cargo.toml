@@ -1,0 +1,16 @@
+[package]
+name = "jens_derive"
+version = "0.5.0"
+authors = ["Jordan West <jordwest@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "jens_derive"
+proc-macro = true
+
+[dependencies]
+syn = "0.15.26"
+quote = "0.6.11"
+jens = { version = "0.5.0", path = "../jens" }
+
+[dev-dependencies]

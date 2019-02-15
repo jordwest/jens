@@ -2,10 +2,10 @@ use crate::parser::{get_ident, parse_phase2, segment::Segment, Rule};
 use pest::iterators::Pair;
 
 #[derive(Debug, Default, PartialEq)]
-pub(crate) struct Template {
-    pub(crate) name: String,
-    pub(crate) indent_ignored: usize,
-    pub(crate) lines: Vec<TemplateLine>,
+pub struct Template {
+    pub name: String,
+    pub indent_ignored: usize,
+    pub lines: Vec<TemplateLine>,
 }
 
 impl<'a> From<Pair<'a, Rule>> for Template {
@@ -29,10 +29,29 @@ impl<'a> From<Pair<'a, Rule>> for Template {
     }
 }
 
+impl Template {
+    pub fn placeholder_names(&self) -> Vec<String> {
+        let mut names = Vec::new();
+        for line in &self.lines {
+            for segment in &line.segments {
+                match segment {
+                    Segment::Placeholder(ref s) => {
+                        if !names.contains(s) {
+                            names.push(s.clone());
+                        }
+                    },
+                    _ => {},
+                }
+            }
+        }
+        names
+    }
+}
+
 #[derive(Debug, Default, PartialEq)]
-pub(crate) struct TemplateLine {
-    pub(crate) indentation: String,
-    pub(crate) segments: Vec<Segment>,
+pub struct TemplateLine {
+    pub indentation: String,
+    pub segments: Vec<Segment>,
 }
 
 impl From<&str> for TemplateLine {

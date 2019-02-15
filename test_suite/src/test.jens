@@ -1,0 +1,7 @@
+template1 =
+    hello!
+----
+
+template2 =
+    hi from template 2 with ${one} and ${two} placeholders
+----
