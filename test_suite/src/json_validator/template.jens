@@ -1,0 +1,63 @@
+main =
+  // This file was generated automatically
+
+  ${types}
+
+  function noop(val: any): any {
+    return val;
+  }
+
+  function serialize_array<T>(serialize_func: (t: T) => any) {
+    return (v: T[]) => v.map(serialize_func);
+  }
+
+  function deserialize_number(val: any): number {
+    if (typeof val !== 'number') {
+      throw new Error('Expected number');
+    }
+    return val;
+  }
+
+  function deserialize_string(val: any): string {
+    if (typeof val !== 'string') {
+      throw new Error('Expected string');
+    }
+    return val;
+  }
+
+  function deserialize_array<T>(element_deserializer: (el: any) => T) {
+    return (val: any) => {
+      if (!Array.isArray(val)) {
+          throw new Error('Expected array');
+      }
+      return val.map(element_deserializer);
+    }
+  }
+--
+
+type_module =
+  module ${type_name} {
+    export type T = {
+      ${type_def_fields}
+    }
+
+    export function serialize(t: T): any {
+      return {
+        ${serialize_fields}
+      }
+    }
+
+    export function deserialize(o: any): T {
+      return {
+        ${deserialize_fields}
+      }
+    }
+  }
+
+--
+
+type_def           = ${field_name}: ${field_type},
+serialize_field    = ${field_name}: ${serialize_func}(t.${field_name}),
+deserialize_field  = ${field_name}: ${deserialize_func}(o['${field_name}']),
+
+fn_call = ${fn_name}(${fn_args})

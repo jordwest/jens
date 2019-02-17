@@ -5,7 +5,7 @@ use crate::{
 
 #[derive(Debug)]
 pub struct File {
-    pub(crate) templates: Vec<Template>,
+    pub templates: Vec<Template>,
 }
 
 impl File {

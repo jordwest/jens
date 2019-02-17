@@ -2,7 +2,7 @@ use crate::parser::{get_ident, Rule};
 use pest::iterators::Pair;
 
 #[derive(Debug, PartialEq)]
-pub(crate) enum Segment {
+pub enum Segment {
     Content(String),
     Placeholder(String),
 }

@@ -1,0 +1,9 @@
+template1 =
+    hello!
+----
+
+template2 =
+    This template has two placeholders:
+      One: "${one}"
+      Two: "${two}"
+----

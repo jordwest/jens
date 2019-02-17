@@ -1,0 +1,10 @@
+[package]
+name = "jens_test_suite"
+version = "0.5.0"
+authors = ["Jordan West <jordwest@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+jens = { version = "0.5.0", path = "../jens" }
+jens_derive = { version = "0.5.0", path = "../jens_derive" }
+insta = "0.6.2"

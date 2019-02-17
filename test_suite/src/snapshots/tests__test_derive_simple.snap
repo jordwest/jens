@@ -1,0 +1,9 @@
+---
+created: "2019-02-17T03:31:59.641635Z"
+creator: insta@0.6.2
+source: src/lib.rs
+expression: t2.to_string()
+---
+This template has two placeholders:
+  One: "hello!"
+  Two: "Hullo"

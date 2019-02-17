@@ -107,6 +107,12 @@ impl Line {
 #[derive(Clone, PartialEq, Debug)]
 pub struct Block(pub Vec<Line>);
 
+impl From<&Block> for String {
+    fn from(v: &Block) -> Self {
+        v.into()
+    }
+}
+
 impl<T: Into<String>> From<T> for Block {
     fn from(v: T) -> Self {
         Block(vec![Line::from(v.into())])
