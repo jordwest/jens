@@ -3,7 +3,7 @@ mod json_validator;
 #[cfg(test)]
 mod tests {
     use insta::assert_snapshot_matches;
-    use jens::{Block, File};
+    use jens::Block;
     use jens_derive::Jens;
 
     #[derive(Jens)]

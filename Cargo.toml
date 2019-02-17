@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+    "jens",
+    "jens_derive",
+    "test_suite",
+]

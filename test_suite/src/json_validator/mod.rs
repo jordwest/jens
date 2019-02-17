@@ -2,7 +2,7 @@ mod generator;
 
 #[cfg(test)]
 mod tests {
-    use super::generator::*;
+    use super::generator::tests::*;
     use insta::assert_snapshot_matches;
 
     #[test]
