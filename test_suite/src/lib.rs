@@ -1,13 +1,21 @@
+mod json_validator;
 
-use jens_derive::Jens;
+#[cfg(test)]
+mod tests {
+    use insta::assert_snapshot_matches;
+    use jens::{Block, File};
+    use jens_derive::Jens;
 
-#[derive(Jens)]
-#[template = "test.jens"]
-struct Xyz {}
+    #[derive(Jens)]
+    #[template = "test.jens"]
+    struct Xyz {}
 
-#[test]
-fn test_derive() {
+    #[test]
+    fn test_derive_simple() {
         let t1 = Xyz::template1();
-        println!("Template output:\n{}", Xyz::template2(t1, "Hullo"));
-        println!("Works!");
+        let t2 = Xyz::template2(t1, "Hullo");
+
+        assert_snapshot_matches!("test_derive_simple", t2.to_string());
+    }
+
 }

@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "jens"
+		},
+		{
+			"path": "jens_derive"
+		},
+		{
+			"path": "test_suite"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.formatOnSave": true
+	}
+}

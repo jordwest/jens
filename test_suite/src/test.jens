@@ -3,5 +3,7 @@ template1 =
 ----
 
 template2 =
-    hi from template 2 with ${one} and ${two} placeholders
+    This template has two placeholders:
+      One: "${one}"
+      Two: "${two}"
 ----

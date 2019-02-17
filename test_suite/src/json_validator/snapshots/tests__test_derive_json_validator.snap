@@ -1,0 +1,102 @@
+---
+created: "2019-02-17T03:52:52.241043Z"
+creator: insta@0.6.2
+source: src/json_validator/mod.rs
+expression: generate(types).to_string()
+---
+// This file was generated automatically
+
+module Book {
+  export type T = {
+    title: string,
+  }
+
+  export function serialize(t: T): any {
+    return {
+      title: noop(t.title),
+    }
+  }
+
+  export function deserialize(o: any): T {
+    return {
+      title: deserialize_string(o['title']),
+    }
+  }
+}
+
+module LibraryMeta {
+  export type T = {
+    founded_year: number,
+    name: string,
+  }
+
+  export function serialize(t: T): any {
+    return {
+      founded_year: noop(t.founded_year),
+      name: noop(t.name),
+    }
+  }
+
+  export function deserialize(o: any): T {
+    return {
+      founded_year: deserialize_number(o['founded_year']),
+      name: deserialize_string(o['name']),
+    }
+  }
+}
+
+module Library {
+  export type T = {
+    count: number,
+    meta: LibraryMeta.T,
+    books: Book.T[],
+  }
+
+  export function serialize(t: T): any {
+    return {
+      count: noop(t.count),
+      meta: LibraryMeta.serialize(t.meta),
+      books: serialize_array(Book.serialize)(t.books),
+    }
+  }
+
+  export function deserialize(o: any): T {
+    return {
+      count: deserialize_number(o['count']),
+      meta: LibraryMeta.deserialize(o['meta']),
+      books: deserialize_array(Book.deserialize)(o['books']),
+    }
+  }
+}
+
+
+function noop(val: any): any {
+  return val;
+}
+
+function serialize_array<T>(serialize_func: (t: T) => any) {
+  return (v: T[]) => v.map(serialize_func);
+}
+
+function deserialize_number(val: any): number {
+  if (typeof val !== 'number') {
+    throw new Error('Expected number');
+  }
+  return val;
+}
+
+function deserialize_string(val: any): string {
+  if (typeof val !== 'string') {
+    throw new Error('Expected string');
+  }
+  return val;
+}
+
+function deserialize_array<T>(element_deserializer: (el: any) => T) {
+  return (val: any) => {
+    if (!Array.isArray(val)) {
+        throw new Error('Expected array');
+    }
+    return val.map(element_deserializer);
+  }
+}
