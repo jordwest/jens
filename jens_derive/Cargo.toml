@@ -4,6 +4,9 @@ version = "0.6.0"
 authors = ["Jordan West <jordwest@gmail.com>"]
 edition = "2018"
 
+description = "Convenience macros for code generation with jens"
+license = "MIT/Apache-2.0"
+
 [lib]
 name = "jens_derive"
 proc-macro = true
