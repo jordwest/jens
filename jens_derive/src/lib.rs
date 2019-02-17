@@ -28,16 +28,16 @@ fn get_path(path: &str) -> PathBuf {
     path
 }
 
-#[proc_macro_derive(Jens, attributes(template))]
+#[proc_macro_derive(Template, attributes(filename))]
 pub fn derive_jens(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let struct_ident = &input.ident;
     let mut filename = None;
-    // Parse out the #[template = "filename"] attribute from the derive
+    // Parse out the #[filename = "filename"] attribute from the derive
     for attr in input.attrs {
         match attr.parse_meta().unwrap() {
             syn::Meta::NameValue(v) => {
-                if v.ident.to_string() == "template" {
+                if v.ident.to_string() == "filename" {
                     if let syn::Lit::Str(s) = v.lit {
                         filename = Some(s.value());
                     }
@@ -48,7 +48,7 @@ pub fn derive_jens(input: TokenStream) -> TokenStream {
     }
 
     let filename = filename
-        .expect("Must provide a template file as an attribute: #[template = \"file.jens\"]");
+        .expect("Must provide a template file as an attribute: #[filename = \"file.jens\"] (relative to crate `/src` directory)");
 
     let path = get_path(&filename);
     let data = match load_file(&path) {

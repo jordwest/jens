@@ -1,7 +1,7 @@
 #[cfg(test)]
 pub mod tests {
     use jens::Block;
-    use jens_derive::Jens;
+    use jens_derive::Template;
     pub enum Json {
         JsString,
         JsNumber,
@@ -19,8 +19,8 @@ pub mod tests {
         pub fields: Vec<TsField>,
     }
 
-    #[derive(Jens)]
-    #[template = "json_validator/template.jens"]
+    #[derive(Template)]
+    #[filename = "json_validator/template.jens"]
     struct Template {}
 
     impl Json {

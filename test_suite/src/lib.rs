@@ -4,10 +4,10 @@ mod json_validator;
 mod tests {
     use insta::assert_snapshot_matches;
     use jens::Block;
-    use jens_derive::Jens;
+    use jens_derive::Template;
 
-    #[derive(Jens)]
-    #[template = "test.jens"]
+    #[derive(Template)]
+    #[filename = "test.jens"]
     struct Xyz {}
 
     #[test]
