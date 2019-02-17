@@ -59,3 +59,5 @@ type_module =
 type_def           = ${field_name}: ${field_type},
 serialize_field    = ${field_name}: ${serialize_func}(t.${field_name}),
 deserialize_field  = ${field_name}: ${deserialize_func}(o['${field_name}']),
+
+fn_call = ${fn_name}(${fn_args})

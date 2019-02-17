@@ -24,35 +24,37 @@ pub mod tests {
     struct Template {}
 
     impl Json {
-        fn get_ts_type(&self) -> String {
+        fn get_ts_type(&self) -> Block {
             use Json::*;
             match self {
                 JsString => "string".into(),
                 JsNumber => "number".into(),
-                JsArray(subtype) => format!("{}[]", subtype.get_ts_type()),
-                JsObject(module_name) => format!("{}.T", module_name),
+                JsArray(subtype) => format!("{}[]", subtype.get_ts_type()).into(),
+                JsObject(module_name) => format!("{}.T", module_name).into(),
             }
         }
 
-        fn get_serialize_func(&self) -> String {
+        fn get_serialize_func(&self) -> Block {
             use Json::*;
             match self {
-                JsString => format!("noop"),
-                JsNumber => format!("noop"),
-                JsArray(subtype) => format!("serialize_array({})", subtype.get_serialize_func()),
-                JsObject(module_name) => format!("{}.serialize", module_name),
-            }
-        }
-
-        fn get_deserialize_func(&self) -> String {
-            use Json::*;
-            match self {
-                JsString => format!("deserialize_string"),
-                JsNumber => format!("deserialize_number"),
+                JsString => format!("noop").into(),
+                JsNumber => format!("noop").into(),
                 JsArray(subtype) => {
-                    format!("deserialize_array({})", subtype.get_deserialize_func())
+                    Template::fn_call("serialize_array", subtype.get_serialize_func())
                 }
-                JsObject(module_name) => format!("{}.deserialize", module_name),
+                JsObject(module_name) => format!("{}.serialize", module_name).into(),
+            }
+        }
+
+        fn get_deserialize_func(&self) -> Block {
+            use Json::*;
+            match self {
+                JsString => format!("deserialize_string").into(),
+                JsNumber => format!("deserialize_number").into(),
+                JsArray(subtype) => {
+                    Template::fn_call("deserialize_array", subtype.get_deserialize_func())
+                }
+                JsObject(module_name) => format!("{}.deserialize", module_name).into(),
             }
         }
     }
