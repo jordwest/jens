@@ -39,8 +39,8 @@ impl Template {
                         if !names.contains(s) {
                             names.push(s.clone());
                         }
-                    },
-                    _ => {},
+                    }
+                    _ => {}
                 }
             }
         }
@@ -83,8 +83,7 @@ impl<'a> From<Pair<'a, Rule>> for TemplateLine {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::parser::{parse, segment::Segment};
+    use crate::parser::parse;
 
     #[test]
     fn empty_template() {

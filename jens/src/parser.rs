@@ -51,7 +51,6 @@ pub(crate) fn get_ident(pair: Pair<'_, Rule>) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::parser::{segment::Segment, template::TemplateLine};
 
     const TEST_TEMPLATE: &str = "template1 =
     line 1 with ${placeholder} in the middle
